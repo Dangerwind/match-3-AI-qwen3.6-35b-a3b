@@ -1,22 +1,97 @@
 /* ========================================
-   CORE GAME LOGIC
+   GAME ORCHESTRATOR
+   Coordinates all modules: board, animations, sound, ui, state.
+   Owns: lifecycle, timer, player interactions, score.
    ======================================== */
 
 const game = {
-    cell1: null,
-    cell2: null,
-    row1: null,
-    col1: null,
-    row2: null,
-    col2: null,
+    _timerInterval: null,
+    _firstCell: null,
+    _firstRow: null,
+    _firstCol: null,
+    _gameBoard: null,
 
     init() {
-        this.bindBoardEvents();
+        this._gameBoard = document.getElementById('game-board');
+        this._bindBoardEvents();
     },
 
-    bindBoardEvents() {
-        this.gameBoard = document.getElementById('game-board');
-        this.gameBoard.addEventListener('click', (e) => {
+    /* ── Lifecycle ─────────────────────────────── */
+
+    start() {
+        resetState();
+        gameState.isRunning = true;
+        gameState.crystalTypes = this._getCrystalTypes();
+
+        ui.showGameScreen();
+
+        this._gameBoard.innerHTML = '';
+        gameState.boardCells = board.initialize(this._gameBoard);
+        gameState.boardData = board.generateInitialBoard(gameState.crystalTypes);
+        board.syncBoardDOM(gameState.boardCells, gameState.boardData);
+
+        ui.updateScore();
+        ui.updateTimer();
+        ui.updateHighscoreDisplay();
+
+        this._startTimer();
+        sound.startMusic();
+    },
+
+    pause() {
+        if (!gameState.isRunning) return;
+        gameState.isPaused = !gameState.isPaused;
+
+        if (gameState.isPaused) {
+            this._stopTimer();
+            sound.stopMusic();
+        } else {
+            this._startTimer();
+            sound.startMusic();
+        }
+    },
+
+    quitToMenu() {
+        this._stopTimer();
+        sound.stopMusic();
+        gameState.isRunning = false;
+        gameState.isPaused = false;
+        ui.showStartScreen();
+    },
+
+    end() {
+        this._stopTimer();
+        gameState.isRunning = false;
+        sound.stopMusic();
+        sound.playGameover();
+        ui.showGameOver(gameState.score);
+    },
+
+    /* ── Timer ─────────────────────────────────── */
+
+    _startTimer() {
+        if (this._timerInterval) clearInterval(this._timerInterval);
+        this._timerInterval = setInterval(() => {
+            if (gameState.isPaused || !gameState.isRunning) return;
+            gameState.time--;
+            ui.updateTimer();
+            if (gameState.time <= 0) {
+                this.end();
+            }
+        }, 1000);
+    },
+
+    _stopTimer() {
+        if (this._timerInterval) {
+            clearInterval(this._timerInterval);
+            this._timerInterval = null;
+        }
+    },
+
+    /* ── Player interaction ────────────────────── */
+
+    _bindBoardEvents() {
+        this._gameBoard.addEventListener('click', (e) => {
             if (!gameState.isRunning || gameState.isPaused || gameState.isProcessing) return;
 
             const cell = e.target.closest('.cell');
@@ -25,86 +100,79 @@ const game = {
             const row = parseInt(cell.dataset.row);
             const col = parseInt(cell.dataset.col);
 
-            this.handleCellClick(row, col, cell);
+            this._handleCellClick(row, col, cell);
         });
     },
 
-    handleCellClick(row, col, cell) {
-        if (!this.cell1) {
-            this.cell1 = cell;
-            this.row1 = row;
-            this.col1 = col;
+    _handleCellClick(row, col, cell) {
+        if (!this._firstCell) {
+            this._firstCell = cell;
+            this._firstRow = row;
+            this._firstCol = col;
             cell.classList.add('selected');
-        } else if (!this.cell2) {
-            if (this.cell1 === cell) {
-                cell.classList.remove('selected');
-                this.cell1 = null;
-                return;
-            }
-
-            this.cell2 = cell;
-            this.row2 = row;
-            this.col2 = col;
-
-            const isAdjacent = (
-                (Math.abs(this.row1 - this.row2) === 1 && this.col1 === this.col2) ||
-                (Math.abs(this.col1 - this.col2) === 1 && this.row1 === this.row2)
-            );
-
-            if (!isAdjacent) {
-                this.cell1.classList.remove('selected');
-                this.cell1 = this.cell2;
-                this.row1 = this.row2;
-                this.col1 = this.col2;
-                this.cell2 = null;
-                this.row2 = null;
-                this.col2 = null;
-                this.cell1.classList.add('selected');
-                return;
-            }
-
-            this.trySwap();
+            return;
         }
+
+        if (this._firstCell === cell) {
+            cell.classList.remove('selected');
+            this._firstCell = null;
+            return;
+        }
+
+        this._secondCell = cell;
+        this._secondRow = row;
+        this._secondCol = col;
+
+        const isAdjacent = (
+            (Math.abs(this._firstRow - this._secondRow) === 1 && this._firstCol === this._secondCol) ||
+            (Math.abs(this._firstCol - this._secondCol) === 1 && this._firstRow === this._secondRow)
+        );
+
+        if (!isAdjacent) {
+            this._firstCell.classList.remove('selected');
+            this._firstCell = this._secondCell;
+            this._firstRow = this._secondRow;
+            this._firstCol = this._secondCol;
+            this._secondCell = null;
+            this._secondRow = null;
+            this._secondCol = null;
+            this._firstCell.classList.add('selected');
+            return;
+        }
+
+        this._executeSwap();
     },
 
-    async trySwap() {
+    /* ── Swap & cascade ────────────────────────── */
+
+    async _executeSwap() {
         gameState.isProcessing = true;
 
-        const cell1 = this.cell1;
-        const cell2 = this.cell2;
-        const row1 = this.row1;
-        const col1 = this.col1;
-        const row2 = this.row2;
-        const col2 = this.col2;
+        const cell1 = this._firstCell;
+        const cell2 = this._secondCell;
+        const row1 = this._firstRow;
+        const col1 = this._firstCol;
+        const row2 = this._secondRow;
+        const col2 = this._secondCol;
 
         cell1.classList.remove('selected');
         cell2.classList.remove('selected');
-        this.cell1 = null;
-        this.cell2 = null;
+        this._firstCell = null;
+        this._secondCell = null;
 
-        // Check if valid move (this temporarily swaps and swaps back)
         const isValid = board.isValidMove(row1, col1, row2, col2, gameState.boardData);
-
         if (!isValid) {
             animations.animateInvalidMove(cell1, cell2);
             gameState.isProcessing = false;
             return;
         }
 
-        // Actually swap the data
         board.swapData(row1, col1, row2, col2, gameState.boardData);
-
-        // Play swap sound
         sound.playSwap();
-
-        // Re-render board to sync DOM with data
         board.renderBoard(gameState.boardCells, gameState.boardData);
 
-        // Find matches in the swapped board
         const matches = board.findMatches(gameState.boardData);
-
         if (matches.size === 0) {
-            // No match - swap back both data and DOM
             board.restoreSwap(gameState.boardData, row1, col1, row2, col2);
             board.renderBoard(gameState.boardCells, gameState.boardData);
             animations.animateInvalidMove(cell1, cell2);
@@ -112,42 +180,32 @@ const game = {
             return;
         }
 
-        // Process cascades
-        const points = await animations.processCascade(gameState.boardData, gameState.boardCells, this.gameBoard);
-
+        const points = await animations.processCascade(gameState.boardData, gameState.boardCells, this._gameBoard);
         gameState.score += points;
         ui.updateScore();
 
-        // Check for possible moves
-        const hasMoves = board.hasPossibleMoves(gameState.boardData, gameState.crystalTypes);
-        if (!hasMoves) {
-            await this.handleNoMoves();
+        if (!board.hasPossibleMoves(gameState.boardData, gameState.crystalTypes)) {
+            ui.showNoMoves();
+            await animations.delay(1000);
+            this._shuffleBoard();
         }
 
         gameState.isProcessing = false;
     },
 
-    async handleNoMoves() {
-        ui.showNoMoves();
-        await animations.delay(1000);
-        this.shuffleBoard();
+    /* ── Shuffle ───────────────────────────────── */
+
+    _shuffleBoard() {
+        this._gameBoard.innerHTML = '';
+        gameState.boardCells = board.initialize(this._gameBoard);
+        gameState.boardData = board.generateInitialBoard(gameState.crystalTypes);
+        board.syncBoardDOM(gameState.boardCells, gameState.boardData);
     },
 
-    shuffleBoard() {
-        this.gameBoard.innerHTML = '';
-        gameState.boardCells = board.initialize(this.gameBoard);
-        gameState.boardData = board.generateInitialBoard(gameState.crystalTypes);
+    /* ── Helpers ───────────────────────────────── */
 
-        for (let r = 0; r < BOARD_ROWS; r++) {
-            for (let c = 0; c < BOARD_COLS; c++) {
-                const cell = board.getCell(gameState.boardCells, r, c);
-                const type = gameState.boardData[r][c];
-                if (cell && type >= 0) {
-                    const crystal = document.createElement('div');
-                    crystal.className = `crystal type-${type}`;
-                    cell.appendChild(crystal);
-                }
-            }
-        }
+    _getCrystalTypes() {
+        const btn = document.querySelector('.crystal-btn.selected');
+        return btn ? parseInt(btn.dataset.count) : 5;
     }
 };

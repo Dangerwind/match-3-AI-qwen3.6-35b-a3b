@@ -99,17 +99,17 @@ const animations = {
             // Animate falling crystals FIRST (before collapsing data)
             await this.animateFallInColumns(boardData, boardCells);
 
-            // Wait for animation to fully complete (crystals must be moved)
-            await this.delay(200);
-
             // NOW collapse the data (logical move)
             board.collapseBoard(boardData);
 
             // Fill empty cells with new crystal types
             board.fillEmptyCells(boardData, gameState.crystalTypes);
 
-            // Animate new crystals appearing
+            // Animate new crystals appearing (only if no crystal already exists)
             await this.fillNewCrystals(boardData, boardCells);
+
+            // SAFETY: remove any extra crystals that shouldn't be in cells
+            this.cleanupExtraCrystals(boardCells);
 
             await this.delay(150);
         }
@@ -163,8 +163,7 @@ const animations = {
             // Get cell dimensions
             const cellHeight = boardCells[0][0].offsetHeight || 50;
 
-            const promises = [];
-
+            // Animate falling and move crystals immediately after animation
             for (const fc of fallingCrystals) {
                 const {crystal, cell, targetCell, fallDistance} = fc;
 
@@ -185,10 +184,12 @@ const animations = {
                 crystal.style.zIndex = '50';
                 crystal.style.transition = 'transform 0.3s cubic-bezier(0.25, 0.1, 0.25, 1)';
                 crystal.style.transform = `translate(${offsetX}px, ${offsetY}px)`;
+            }
 
-                // After animation, move crystal to target cell and reset positioning
-                setTimeout(() => {
-                    // Reset crystal to be a normal child of target cell
+            // After animation completes, move crystals to target cells and clean up styles
+            setTimeout(() => {
+                for (const fc of fallingCrystals) {
+                    const {crystal, targetCell} = fc;
                     crystal.style.position = '';
                     crystal.style.top = '';
                     crystal.style.left = '';
@@ -196,12 +197,9 @@ const animations = {
                     crystal.style.transition = '';
                     crystal.style.transform = '';
                     targetCell.appendChild(crystal);
-                }, 350);
-
-                promises.push(this.delay(400));
-            }
-
-            Promise.all(promises).then(resolve);
+                }
+                resolve();
+            }, 350);
         });
     },
 
@@ -213,8 +211,9 @@ const animations = {
                 for (let c = 0; c < BOARD_COLS; c++) {
                     const cell = board.getCell(boardCells, r, c);
                     const type = boardData[r][c];
+                    const existingCrystal = cell.querySelector('.crystal');
 
-                    if (type >= 0 && !cell.querySelector('.crystal')) {
+                    if (type >= 0 && !existingCrystal) {
                         // This is a new crystal that needs to appear
                         const newCrystal = document.createElement('div');
                         newCrystal.className = `crystal type-${type}`;
@@ -257,5 +256,22 @@ const animations = {
             cell1.classList.remove('shaking');
             cell2.classList.remove('shaking');
         }, 300);
+    },
+
+    cleanupExtraCrystals(boardCells) {
+        for (let r = 0; r < BOARD_ROWS; r++) {
+            for (let c = 0; c < BOARD_COLS; c++) {
+                const cell = board.getCell(boardCells, r, c);
+                if (!cell) continue;
+
+                const crystals = cell.querySelectorAll('.crystal');
+                if (crystals.length <= 1) continue;
+
+                // Remove extra crystals, keep the first one
+                for (let i = 1; i < crystals.length; i++) {
+                    crystals[i].remove();
+                }
+            }
+        }
     }
 };

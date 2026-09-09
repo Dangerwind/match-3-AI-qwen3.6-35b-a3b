@@ -126,24 +126,47 @@ const board = {
     renderBoard(cells, data) {
         for (let r = 0; r < BOARD_ROWS; r++) {
             for (let c = 0; c < BOARD_COLS; c++) {
-                const type = data[r][c];
+                this.renderCell(cells, r, c, data[r][c]);
+            }
+        }
+    },
+
+    renderCell(cells, row, col, type) {
+        const cell = this.getCell(cells, row, col);
+        if (!cell) return;
+
+        const crystal = cell.querySelector('.crystal');
+        if (type >= 0) {
+            if (!crystal) {
+                const newCrystal = document.createElement('div');
+                newCrystal.className = `crystal type-${type}`;
+                cell.appendChild(newCrystal);
+            } else if (!crystal.classList.contains(`type-${type}`)) {
+                crystal.className = `crystal type-${type}`;
+            }
+        } else {
+            if (crystal) crystal.remove();
+        }
+    },
+
+    syncBoardDOM(cells, data) {
+        for (let r = 0; r < BOARD_ROWS; r++) {
+            for (let c = 0; c < BOARD_COLS; c++) {
                 const cell = this.getCell(cells, r, c);
                 if (!cell) continue;
 
                 const crystal = cell.querySelector('.crystal');
-                if (type >= 0) {
-                    if (!crystal) {
-                        // Add new crystal
-                        const newCrystal = document.createElement('div');
-                        newCrystal.className = `crystal type-${type}`;
-                        cell.appendChild(newCrystal);
-                    } else if (!crystal.classList.contains(`type-${type}`)) {
-                        // Update existing crystal type
-                        crystal.className = `crystal type-${type}`;
-                    }
-                } else {
-                    // Remove crystal (empty cell)
-                    if (crystal) crystal.remove();
+                const type = data[r][c];
+                const hasCrystal = crystal !== null;
+
+                if (type >= 0 && !hasCrystal) {
+                    const newCrystal = document.createElement('div');
+                    newCrystal.className = `crystal type-${type}`;
+                    cell.appendChild(newCrystal);
+                } else if (type >= 0 && hasCrystal) {
+                    crystal.className = `crystal type-${type}`;
+                } else if (type < 0 && hasCrystal) {
+                    crystal.remove();
                 }
             }
         }
