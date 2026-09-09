@@ -1,0 +1,670 @@
+/* ========================================
+   MATCH-3 GAME - STYLES
+   ======================================== */
+
+:root {
+    --bg-primary: #1a1a2e;
+    --bg-secondary: #16213e;
+    --bg-panel: #0f3460;
+    --accent: #e94560;
+    --text-primary: #ffffff;
+    --text-secondary: #a0a0b0;
+    --gold: #ffd700;
+    --board-bg: #1e2746;
+    --cell-bg: #2a3560;
+    --cell-border: #3a4570;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, var(--bg-primary), var(--bg-secondary));
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: var(--text-primary);
+    overflow: hidden;
+}
+
+#app {
+    width: 100%;
+    max-width: 600px;
+    padding: 10px;
+    position: relative;
+}
+
+/* ========================================
+   SCREENS
+   ======================================== */
+
+.screen {
+    display: none;
+    width: 100%;
+}
+
+.screen.active {
+    display: block;
+}
+
+/* ========================================
+   START SCREEN
+   ======================================== */
+
+.game-title {
+    text-align: center;
+    font-size: 3rem;
+    font-weight: 900;
+    background: linear-gradient(135deg, #ff6b6b, #ffd93d, #6bcb77, #4d96ff, #9b59b6);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-transform: uppercase;
+    letter-spacing: 4px;
+    margin-bottom: 30px;
+    text-shadow: none;
+    filter: drop-shadow(0 0 20px rgba(233, 69, 96, 0.3));
+}
+
+.start-content {
+    text-align: center;
+    padding: 20px;
+}
+
+.start-hint {
+    font-size: 1.1rem;
+    color: var(--text-secondary);
+    margin-bottom: 20px;
+}
+
+.crystal-count-selector {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin-bottom: 30px;
+}
+
+.crystal-btn {
+    width: 55px;
+    height: 55px;
+    border: 3px solid var(--cell-border);
+    background: var(--cell-bg);
+    color: var(--text-primary);
+    font-size: 1.3rem;
+    font-weight: 700;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.crystal-btn:hover {
+    border-color: var(--accent);
+    background: var(--bg-panel);
+    transform: scale(1.05);
+}
+
+.crystal-btn.selected {
+    border-color: var(--accent);
+    background: var(--accent);
+    transform: scale(1.1);
+    box-shadow: 0 0 15px rgba(233, 69, 96, 0.5);
+}
+
+.start-btn {
+    padding: 15px 50px;
+    font-size: 1.2rem;
+    font-weight: 700;
+    background: linear-gradient(135deg, var(--accent), #ff6b6b);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+.start-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 5px 25px rgba(233, 69, 96, 0.5);
+}
+
+.highscore-display {
+    margin-top: 20px;
+    font-size: 0.95rem;
+    color: var(--gold);
+}
+
+/* ========================================
+   GAME SCREEN
+   ======================================== */
+
+.game-header {
+    display: flex;
+    justify-content: space-around;
+    margin-bottom: 10px;
+    gap: 10px;
+}
+
+.score-panel, .time-panel {
+    flex: 1;
+    text-align: center;
+    background: var(--bg-panel);
+    padding: 10px 15px;
+    border-radius: 12px;
+    border: 2px solid var(--cell-border);
+}
+
+.score-panel .label, .time-panel .label {
+    display: block;
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 4px;
+}
+
+.score-value, .time-value {
+    display: block;
+    font-size: 1.8rem;
+    font-weight: 700;
+}
+
+.time-value.warning {
+    color: var(--accent);
+    animation: pulse 1s ease-in-out infinite;
+}
+
+.highscore-panel {
+    text-align: center;
+    font-size: 0.85rem;
+    color: var(--gold);
+    margin-bottom: 10px;
+}
+
+.game-board {
+    display: grid;
+    gap: 3px;
+    background: var(--board-bg);
+    padding: 10px;
+    border-radius: 16px;
+    border: 3px solid var(--cell-border);
+    margin: 0 auto;
+    box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.3), 0 5px 30px rgba(0, 0, 0, 0.3);
+}
+
+.pause-btn {
+    display: block;
+    margin: 15px auto 0;
+    padding: 10px 30px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    background: var(--bg-panel);
+    color: var(--text-primary);
+    border: 2px solid var(--cell-border);
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.pause-btn:hover {
+    border-color: var(--accent);
+    background: var(--cell-bg);
+}
+
+.mute-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    background: var(--bg-panel);
+    color: var(--text-primary);
+    border: 2px solid var(--cell-border);
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    padding: 0;
+}
+
+.mute-btn:hover {
+    border-color: var(--accent);
+    background: var(--cell-bg);
+    transform: scale(1.05);
+}
+
+.mute-btn.muted svg {
+    opacity: 0.4;
+}
+
+.mute-btn .sound-waves {
+    opacity: 1;
+    transition: opacity 0.2s ease;
+}
+
+.mute-btn.muted .sound-waves {
+    opacity: 0.2;
+}
+
+/* ========================================
+   CELLS & CRYSTALS
+   ======================================== */
+
+.cell {
+    width: 100%;
+    aspect-ratio: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--cell-bg);
+    border-radius: 10px;
+    border: 2px solid transparent;
+    cursor: pointer;
+    transition: border-color 0.15s ease, transform 0.15s ease;
+    position: relative;
+    overflow: visible;
+}
+
+.cell:hover {
+    border-color: var(--cell-border);
+}
+
+.cell.selected {
+    border-color: #fff;
+    box-shadow: 0 0 12px rgba(255, 255, 255, 0.5);
+    animation: cellPulse 0.8s ease-in-out infinite;
+}
+
+.cell.hint {
+    animation: hintPulse 0.6s ease-in-out 3;
+}
+
+.crystal {
+    width: 80%;
+    height: 80%;
+    border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+    position: relative;
+    transition: transform 0.2s ease;
+    background: linear-gradient(135deg, #888, #aaa, #666);
+}
+
+.crystal::before {
+    content: '';
+    position: absolute;
+    top: 12%;
+    left: 20%;
+    width: 30%;
+    height: 25%;
+    background: radial-gradient(ellipse, rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0));
+    border-radius: 50%;
+    transform: rotate(-20deg);
+}
+
+.crystal::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    box-shadow: inset 0 -3px 6px rgba(0, 0, 0, 0.2), 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+/* Crystal Types */
+.crystal.type-0 {
+    background: linear-gradient(135deg, #ff4757, #ff6b81, #ee5a24);
+    box-shadow: 0 0 10px rgba(255, 71, 87, 0.4);
+}
+
+.crystal.type-1 {
+    background: linear-gradient(135deg, #2ed573, #7bed9f, #26de81);
+    box-shadow: 0 0 10px rgba(46, 213, 115, 0.4);
+}
+
+.crystal.type-2 {
+    background: linear-gradient(135deg, #1e90ff, #70a1ff, #3742fa);
+    box-shadow: 0 0 10px rgba(30, 144, 255, 0.4);
+}
+
+.crystal.type-3 {
+    background: linear-gradient(135deg, #ffd700, #ffda44, #ffa502);
+    box-shadow: 0 0 10px rgba(255, 215, 0, 0.4);
+}
+
+.crystal.type-4 {
+    background: linear-gradient(135deg, #a855f7, #c084fc, #8b5cf6);
+    box-shadow: 0 0 10px rgba(168, 85, 247, 0.4);
+}
+
+.crystal.type-5 {
+    background: linear-gradient(135deg, #ff6348, #ff793f, #ff5800);
+    box-shadow: 0 0 10px rgba(255, 99, 72, 0.4);
+}
+
+.crystal.type-6 {
+    background: linear-gradient(135deg, #00d2d3, #48dbfb, #0abde3);
+    box-shadow: 0 0 10px rgba(0, 210, 211, 0.4);
+}
+
+/* ========================================
+   OVERLAYS
+   ======================================== */
+
+.overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.8);
+    z-index: 100;
+    justify-content: center;
+    align-items: center;
+    backdrop-filter: blur(5px);
+}
+
+.overlay.active {
+    display: flex;
+}
+
+.overlay-content {
+    text-align: center;
+    padding: 40px;
+    background: var(--bg-secondary);
+    border-radius: 20px;
+    border: 2px solid var(--cell-border);
+    box-shadow: 0 10px 50px rgba(0, 0, 0, 0.5);
+    min-width: 280px;
+}
+
+.overlay-content h2 {
+    font-size: 2rem;
+    margin-bottom: 20px;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+}
+
+.overlay-content p {
+    color: var(--text-secondary);
+    margin-bottom: 20px;
+}
+
+.overlay-btn {
+    display: block;
+    width: 100%;
+    padding: 12px 20px;
+    margin-bottom: 10px;
+    font-size: 1rem;
+    font-weight: 600;
+    background: var(--bg-panel);
+    color: var(--text-primary);
+    border: 2px solid var(--cell-border);
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.overlay-btn:hover {
+    border-color: var(--accent);
+    background: var(--cell-bg);
+    transform: scale(1.02);
+}
+
+.overlay-btn:last-child {
+    margin-bottom: 0;
+}
+
+/* ========================================
+   GAME OVER
+   ======================================== */
+
+.final-scores {
+    margin: 20px 0;
+}
+
+.final-score {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 20px;
+    margin: 5px 0;
+    background: var(--bg-panel);
+    border-radius: 8px;
+}
+
+.final-label {
+    color: var(--text-secondary);
+    font-size: 1.1rem;
+}
+
+.final-score span:last-child {
+    font-weight: 700;
+    font-size: 1.2rem;
+}
+
+#new-record-row {
+    background: linear-gradient(135deg, rgba(255, 215, 0, 0.2), rgba(255, 215, 0, 0.1));
+    border: 1px solid var(--gold);
+}
+
+#new-record-row .final-label {
+    color: var(--gold);
+    font-weight: 700;
+}
+
+/* No Moves */
+.overlay.no-moves .overlay-content {
+    background: var(--bg-panel);
+}
+
+/* ========================================
+   SCORE POPUP
+   ======================================== */
+
+.score-popup {
+    position: absolute;
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--gold);
+    text-shadow: 0 0 10px rgba(255, 215, 0, 0.8), 0 2px 4px rgba(0, 0, 0, 0.5);
+    pointer-events: none;
+    z-index: 50;
+    animation: scoreFloat 0.8s ease-out forwards;
+}
+
+/* ========================================
+   ANIMATIONS
+   ======================================== */
+
+@keyframes cellPulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+}
+
+@keyframes hintPulse {
+    0%, 100% { transform: scale(1); box-shadow: none; }
+    50% { transform: scale(1.1); box-shadow: 0 0 15px rgba(255, 255, 255, 0.5); }
+}
+
+@keyframes swap {
+    0% { transform: scale(1); }
+    50% { transform: scale(0.85); }
+    100% { transform: scale(1); }
+}
+
+@keyframes destroy {
+    0% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.3); opacity: 0.8; }
+    100% { transform: scale(0); opacity: 0; }
+}
+
+@keyframes fall {
+    from { transform: translateY(-100%); opacity: 0.5; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes scoreFloat {
+    0% { transform: translateY(0) scale(1); opacity: 1; }
+    100% { transform: translateY(-40px) scale(1.3); opacity: 0; }
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    75% { transform: translateX(5px); }
+}
+
+@keyframes boardShake {
+    0%, 100% { transform: translateX(0); }
+    10%, 30%, 50%, 70%, 90% { transform: translateX(-3px); }
+    20%, 40%, 60%, 80% { transform: translateX(3px); }
+}
+
+@keyframes newCrystalAppear {
+    0% { transform: scale(0) rotate(-180deg); opacity: 0; }
+    60% { transform: scale(1.2) rotate(10deg); opacity: 1; }
+    100% { transform: scale(1) rotate(0deg); opacity: 1; }
+}
+
+.falling {
+    animation: fall 0.35s cubic-bezier(0.25, 0.1, 0.25, 1);
+}
+
+.crystal.falling-anim {
+    transition: transform 0.35s cubic-bezier(0.25, 0.1, 0.25, 1);
+}
+
+.crystal.new-crystal-anim {
+    animation: newCrystalAppear 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+.crystal.destroy-anim {
+    animation: destroyAndExpand 0.35s ease-in forwards;
+}
+
+.destroying {
+    animation: destroy 0.35s ease-in forwards;
+}
+
+@keyframes destroyAndExpand {
+    0% { transform: scale(1); opacity: 1; }
+    40% { transform: scale(1.2); opacity: 0.9; }
+    70% { transform: scale(1.4); opacity: 0.6; }
+    100% { transform: scale(0); opacity: 0; }
+}
+
+.crystal.destroy-anim {
+    animation: destroyAndExpand 0.35s ease-in forwards;
+}
+
+.swapping {
+    animation: swap 0.25s ease;
+}
+
+.shaking {
+    animation: shake 0.3s ease;
+}
+
+.new-crystal {
+    animation: newCrystalAppear 0.5s ease-out;
+}
+
+/* ========================================
+   RESPONSIVE
+   ======================================== */
+
+@media (max-width: 600px) {
+    #app {
+        max-width: 100%;
+        padding: 8px;
+    }
+
+    .game-title {
+        font-size: 2.2rem;
+        margin-bottom: 20px;
+    }
+
+    .crystal-btn {
+        width: 45px;
+        height: 45px;
+        font-size: 1.1rem;
+    }
+
+    .start-btn {
+        padding: 12px 40px;
+        font-size: 1rem;
+    }
+
+    .score-value, .time-value {
+        font-size: 1.5rem;
+    }
+
+    .score-panel, .time-panel {
+        padding: 8px 10px;
+    }
+
+    .game-board {
+        padding: 6px;
+        gap: 2px;
+        border-radius: 12px;
+    }
+
+    .cell {
+        border-radius: 8px;
+    }
+
+    .overlay-content {
+        padding: 25px;
+        min-width: 240px;
+        margin: 20px;
+    }
+
+    .overlay-content h2 {
+        font-size: 1.5rem;
+    }
+}
+
+@media (max-width: 400px) {
+    .game-title {
+        font-size: 1.8rem;
+        letter-spacing: 2px;
+    }
+
+    .game-header {
+        gap: 6px;
+    }
+
+    .score-panel, .time-panel {
+        padding: 6px 8px;
+    }
+
+    .score-value, .time-value {
+        font-size: 1.3rem;
+    }
+
+    .game-board {
+        padding: 4px;
+        gap: 2px;
+    }
+
+    .crystal-btn {
+        width: 40px;
+        height: 40px;
+        font-size: 1rem;
+    }
+}
+
+@media (min-width: 768px) {
+    #app {
+        max-width: 500px;
+    }
+}

@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MATCH-3</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div id="app">
+        <!-- Start Screen -->
+        <div id="start-screen" class="screen active">
+            <h1 class="game-title">MATCH-3</h1>
+            <div class="start-content">
+                <p class="start-hint">Выберите количество типов кристаллов</p>
+                <div class="crystal-count-selector">
+                    <button class="crystal-btn" data-count="4">4</button>
+                    <button class="crystal-btn" data-count="5">5</button>
+                    <button class="crystal-btn" data-count="6">6</button>
+                    <button class="crystal-btn" data-count="7">7</button>
+                </div>
+                <button id="start-btn" class="start-btn">НАЧАТЬ ИГРУ</button>
+                <div id="start-highscore" class="highscore-display"></div>
+            </div>
+        </div>
+
+        <!-- Game Screen -->
+        <div id="game-screen" class="screen">
+            <div class="game-header">
+                <div class="score-panel">
+                    <span class="label">СЧЁТ</span>
+                    <span id="score-display" class="score-value">0</span>
+                </div>
+                <div class="time-panel">
+                    <span class="label">ВРЕМЯ</span>
+                    <span id="timer-display" class="time-value">60</span>
+                </div>
+                <button id="mute-btn" class="mute-btn" title="Звук">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+                        <path class="sound-waves" d="M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+                        <path class="sound-waves" d="M19.07 4.93a10 10 0 0 1 0 14.14"></path>
+                    </svg>
+                </button>
+            </div>
+            <div class="highscore-panel">
+                РЕКОРД: <span id="highscore-display">0</span>
+            </div>
+            <div id="game-board" class="game-board"></div>
+            <button id="pause-btn" class="pause-btn">ПАУЗА</button>
+        </div>
+
+        <!-- Pause Overlay -->
+        <div id="pause-overlay" class="overlay">
+            <div class="overlay-content">
+                <h2>ПАУЗА</h2>
+                <button id="continue-btn" class="overlay-btn">ПРОДОЛЖИТЬ</button>
+                <button id="quit-btn" class="overlay-btn">В МЕНЮ</button>
+            </div>
+        </div>
+
+        <!-- Game Over Overlay -->
+        <div id="gameover-overlay" class="overlay">
+            <div class="overlay-content">
+                <h2>ИГРА ОКОНЧЕНА</h2>
+                <div class="final-scores">
+                    <div class="final-score">
+                        <span class="final-label">Счёт:</span>
+                        <span id="final-score-display">0</span>
+                    </div>
+                    <div class="final-score" id="new-record-row" style="display:none;">
+                        <span class="final-label">НОВЫЙ РЕКОРД!</span>
+                    </div>
+                    <div class="final-score">
+                        <span class="final-label">Рекорд:</span>
+                        <span id="final-highscore-display">0</span>
+                    </div>
+                </div>
+                <button id="play-again-btn" class="overlay-btn">ИГРАТЬ СНОВА</button>
+                <button id="menu-btn" class="overlay-btn">В МЕНЮ</button>
+            </div>
+        </div>
+
+        <!-- No Moves Overlay -->
+        <div id="no-moves-overlay" class="overlay no-moves">
+            <div class="overlay-content">
+                <h2>НЕТ ХОДОВ</h2>
+                <p>Перемешиваем...</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/state.js"></script>
+    <script src="js/crystals.js"></script>
+    <script src="js/board.js"></script>
+    <script src="js/animations.js"></script>
+    <script src="js/sound.js"></script>
+    <script src="js/ui.js"></script>
+    <script src="js/game.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>
