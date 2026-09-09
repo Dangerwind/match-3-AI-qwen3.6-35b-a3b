@@ -293,6 +293,9 @@ body {
     position: relative;
     transition: transform 0.2s ease;
     background: linear-gradient(135deg, #888, #aaa, #666);
+    will-change: transform;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
 }
 
 .crystal::before {
